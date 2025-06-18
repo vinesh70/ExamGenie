@@ -21,8 +21,8 @@
 
 ## 🛠️ Tech Stack
 
-- Python 3.x  
-- Django 3.x/4.x  
+- Python 3.11  
+- Django 3.11  
 - SQLite3  
 - FAISS, PyPDF2, HuggingFace Transformers, Pandas, etc.
 
@@ -148,7 +148,7 @@ http://127.0.0.1:8000/
 
 ## 📬 Contact
 
-**Developed by:** [Vinesh Ryapak](https://www.linkedin.com/in/vinesh-ryapak-73693a227/)
+**Developed by:** [Vinesh Ryapak](https://www.portfolio-website-30hvs224u-vinesh-ryapaks-projects.vercel.app)
 
 - 📧 **Email:** [vineshryapak1234@gmail.com](mailto:vineshryapak1234@gmail.com)
 - 🔗 **LinkedIn:** [linkedin.com/in/vinesh-ryapak-73693a227](https://www.linkedin.com/in/vinesh-ryapak-73693a227/)
