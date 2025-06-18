@@ -304,5 +304,4 @@ http://127.0.0.1:8000/
 - 🔗 **LinkedIn:** [linkedin.com/in/vinesh-ryapak-73693a227](https://www.linkedin.com/in/vinesh-ryapak-73693a227/)
 )
 
-- 📧 **Email:** [vineshryapak1234@gmail.com](mailto:vineshryapak1234@gmail.com)
-- 🔗 **LinkedIn:** [linkedin.com/in/vinesh-ryapak-73693a227](https://www.linkedin.com/in/vinesh-ryapak-73693a227/)
+
