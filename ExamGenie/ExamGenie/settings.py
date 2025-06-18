@@ -33,7 +33,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 import os
 
 # Add this line to your settings.py
-os.environ['GEMINI_API_KEY'] = 'AIzaSyBOvBt2ACw3BeaziRFAI2h_pPUbmUIv1FI'
+os.environ['GEMINI_API_KEY'] = ''
 
 ALLOWED_HOSTS = []
 
