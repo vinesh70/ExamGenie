@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Paper</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f8fa;
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-size: 1rem;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        select[multiple] {
+            height: 120px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            font-size: 1rem;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #218838;
+        }
+
+        .form-section div {
+            margin-bottom: 20px;
+        }
+
+        .form-section select, .form-section input {
+            font-size: 1rem;
+        }
+
+        .form-section .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-section .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-section p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+
+
+
+
+
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        /* Profile Section Styling */
+        #profile-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        {% comment %} /* Profile Photo */
+        #profile-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+            margin-right: 10px;
+            border: 2px solid white;
+            position: relative;
+        } {% endcomment %}
+
+        .profile-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 40px;
+        }
+        
+        /* Profile Dropdown */
+        #profile-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            min-width: 150px;
+            z-index: 1000;
+            
+            /* Initially hidden */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+        }
+        
+        /* Show dropdown on hover */
+        #profile-container:hover #profile-dropdown {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Dropdown Links */
+        #profile-dropdown a {
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
+        }
+        
+        #profile-dropdown a:hover {
+            background-color: #f1f1f1;
+        }
+        
+        /* Divider */
+        .divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 0;
+        }
+
+
+        button {
+            padding: 10px 20px;
+            background-color: #5cb85c;
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .nav-item {
+            background-color: #1a73e8;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            display: inline-block;
+            position: absolute;
+            right: 100px; /* Adjust distance from the right */
+            top: 4%
+            transform: translateY(-50%); /* Centers it vertically */
+        }
+
+
+        .nav-item1 {
+            background-color: #1a73e8;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            display: inline-block;
+            position: absolute;
+            right: 230px; /* Adjust distance from the right */
+            top: 4%
+            transform: translateY(-50%); /* Centers it vertically */
+        }
+        
+    </style>
+
+
+    <!-- Add simple JavaScript to toggle dropdown on profile click -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          // Toggle dropdown when clicking profile photo
+          const profilePhoto = document.getElementById('profile-photo');
+          const dropdown = document.getElementById('profile-dropdown');
+          
+          profilePhoto.addEventListener('click', function(event) {
+            event.stopPropagation(); // Prevent event from bubbling up
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+          });
+          
+          // Close dropdown when clicking outside
+          document.addEventListener('click', function(event) {
+            if (!profilePhoto.contains(event.target) && !dropdown.contains(event.target)) {
+              dropdown.style.display = 'none';
+            }
+          });
+        });
+      </script>
+</head>
+<body>
+
+
+    <!-- ExamGenie Navbar -->
+<div style="background-color: #1a73e8; color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; width: 100%;">
+    <!-- Brand/Logo -->
+    <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" id="examgenie-brand" style="font-size: 24px; font-weight: bold; color: white; text-decoration: none; cursor: pointer;">
+      ExamGenie
+    </a>
+    
+    <a href="{% url 'dashboard' %}" class="nav-item" style="color: white; text-decoration: none; margin: 0 15px;">
+      Dashboard
+    </a>
+    
+    <!-- Profile Section -->
+    <div id="profile-container" style="position: relative; display: flex; align-items: center;">
+      <!-- Profile Photo -->
+      <div id="profile-photo" style="cursor: pointer;">
+        <img src="{{ user.profile_photo.url }}" alt="Profile" class="profile-pic" style="width: 40px; height: 40px; border-radius: 50%;">
+      </div>
+      
+      <!-- Dropdown Menu -->
+      <div id="profile-dropdown" style="position: absolute; top: 100%; right: 0; background-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2); border-radius: 4px; display: none; min-width: 150px; margin-top: 5px; z-index: 1001;">
+        <a href="{% url 'profile' %}" style="display: block; padding: 10px 15px; color: #333; text-decoration: none;">Profile</a>
+        <div class="divider" style="height: 1px; background-color: #eee;"></div>
+        <a href="{% url 'logout' %}" style="display: block; padding: 10px 15px; color: #333; text-decoration: none;">Logout</a>
+      </div>
+    </div>
+  </div>
+
+
+    <h2>Generate Paper from Question Bank</h2>
+
+    <div class="container">
+        <form method="POST" action="{% url 'generate_paper' %}">
+            {% csrf_token %}
+            
+            <!-- Select Semester -->
+            <div class="form-section">
+                <label for="semester">Select Semester</label>
+                <select id="semester" name="semester">
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
+                    <option value="6">Semester 6</option>
+                    <option value="7">Semester 7</option>
+                    <option value="8">Semester 8</option>
+                </select>
+            </div>
+
+            <!-- Select Subject -->
+            <div class="form-section">
+                <label for="subject_name">Subject Name</label>
+                <input type="text" id="subject_name" name="subject" placeholder="Enter Subject Name" required>
+            </div>
+
+            <!-- Subject Code -->
+            <div class="form-section">
+                <label for="subject_code">Subject Code</label>
+                <input type="text" id="subject_code" name="subject_code" placeholder="Enter Subject Code" required>
+            </div>
+
+            <!-- Select Branch -->
+            <div class="form-section">
+                <label for="branch">Select Branch</label>
+                <select id="branch" name="branch">
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Mechanical">Mechanical</option>
+                    <option value="INFT">Information Technology</option>
+                </select>
+            </div>
+
+            <!-- Select Exam Type -->
+            <div class="form-section">
+                <label for="exam_type">Select Exam Type</label>
+                <select id="exam_type" name="exam_type" onchange="toggleExamOptions()">
+                    <option value="MSE">MSE</option>
+                    <option value="ESE">ESE</option>
+                </select>
+            </div>
+
+            <!-- MSE Chapters -->
+            <div id="chapters_container" class="hidden">
+                <div class="form-section">
+                    <label for="chapters">Select Chapters (for MSE)</label>
+                    <select id="chapters" name="chapters" multiple>
+                        <option value="1">Chapter 1</option>
+                        <option value="2">Chapter 2</option>
+                        <option value="3">Chapter 3</option>
+                        <option value="4">Chapter 4</option>
+                        <option value="5">Chapter 5</option>
+                        <option value="6">Chapter 6</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Exam Time -->
+            <div class="form-section">
+                <label for="exam_time">Exam Time (e.g., 10:00 AM - 11:00 AM):</label>
+                <input type="text" id="exam_time" name="exam_time" required>
+            </div>
+
+            <!-- Exam Date -->
+            <div class="form-section">
+                <label for="exam_date">Exam Date:</label>
+                <input type="date" id="exam_date" name="exam_date" required>
+            </div>
+
+            <!-- Question Marks Selection -->
+            <div class="form-section">
+                <label for="q1">Q1: Select marks for the first question:</label>
+                <select id="q1" name="q1" required>
+                    <option value="2">2 Marks</option>
+                    <option value="5">5 Marks</option>
+                    <option value="10">10 Marks</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <label for="q2">Q2: Select marks for the second question:</label>
+                <select id="q2" name="q2" required>
+                    <option value="5">5 Marks</option>
+                    <option value="10">10 Marks</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <label for="q3">Q3: Select marks for the third question:</label>
+                <select id="q3" name="q3" required>
+                    <option value="5">5 Marks</option>
+                    <option value="10">10 Marks</option>
+                </select>
+            </div>
+
+            <!-- Extra Questions (Only for ESE) -->
+            <div id="extra-questions" class="hidden">
+                <div class="form-section">
+                    <label for="q4">Q4: Select marks for the fourth question:</label>
+                    <select id="q4" name="q4">
+                        <option value="5">5 Marks</option>
+                        <option value="10">10 Marks</option>
+                    </select>
+                </div>
+
+                <div class="form-section">
+                    <label for="q5">Q5: Select marks for the fifth question:</label>
+                    <select id="q5" name="q5">
+                        <option value="5">5 Marks</option>
+                        <option value="10">10 Marks</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit">Generate Paper</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleExamOptions() {
+            var examType = document.getElementById("exam_type").value;
+            var chaptersContainer = document.getElementById("chapters_container");
+            var extraQuestions = document.getElementById("extra-questions");
+
+            if (examType === "MSE") {
+                chaptersContainer.classList.remove("hidden");
+                extraQuestions.classList.add("hidden");
+            } else {
+                chaptersContainer.classList.add("hidden");
+                extraQuestions.classList.remove("hidden");
+            }
+        }
+
+        window.onload = toggleExamOptions;
+    </script>
+    
+</body>
+</html>

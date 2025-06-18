@@ -1,0 +1,706 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Teacher Registration Portal - Create your account to join our educational platform">
+    <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/flash.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>Teacher Registration | Education Portal</title>
+    <style>
+        :root {
+            --primary-color: #4a6fdc;
+            --primary-hover: #3a5fc0;
+            --secondary-color: #34c759;
+            --text-color: #333333;
+            --light-gray: #f5f5f7;
+            --medium-gray: #e1e1e1;
+            --dark-gray: #777777;
+            --error-color: #ff3b30;
+            --success-color: #34c759;
+            --warning-color: #ff9500;
+            --border-radius: 8px;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-color);
+            background-color: var(--light-gray);
+            line-height: 1.6;
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: white;
+            box-shadow: var(--shadow);
+            padding: 1rem 0;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        .nav-links a {
+            margin-left: 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links .btn-login {
+            padding: 0.5rem 1rem;
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: var(--border-radius);
+        }
+
+        .nav-links .btn-login:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2.5rem;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-header h1 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: var(--dark-gray);
+        }
+
+        .flash-message {
+            margin-bottom: 1.5rem;
+            padding: 0.8rem 1rem;
+            border-radius: var(--border-radius);
+            background-color: var(--warning-color);
+            color: white;
+            font-weight: 500;
+        }
+
+        .flash-message.success {
+            background-color: var(--success-color);
+        }
+
+        .flash-message.error {
+            background-color: var(--error-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 111, 220, 0.2);
+        }
+
+        .form-control.error {
+            border-color: var(--error-color);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--dark-gray);
+            background: none;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .file-upload {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .file-upload-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            overflow: hidden;
+            border: 2px solid var(--medium-gray);
+        }
+
+        .file-upload-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .file-upload-icon {
+            color: var(--dark-gray);
+            font-size: 2.5rem;
+        }
+
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .file-upload-button {
+            padding: 0.5rem 1rem;
+            background-color: var(--light-gray);
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .file-upload-button:hover {
+            background-color: var(--medium-gray);
+        }
+
+        .file-upload-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .form-footer {
+            margin-top: 1.5rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: white;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .form-footer-text {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+
+        .form-footer-text a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .form-footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        .password-strength {
+            margin-top: 0.3rem;
+        }
+
+        .password-strength-meter {
+            height: 5px;
+            background-color: var(--light-gray);
+            border-radius: 2.5px;
+            margin-top: 0.3rem;
+            overflow: hidden;
+        }
+
+        .password-strength-meter-bar {
+            height: 100%;
+            border-radius: 2.5px;
+            transition: var(--transition);
+        }
+
+        .password-strength-text {
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .weak .password-strength-meter-bar {
+            width: 25%;
+            background-color: var(--error-color);
+        }
+
+        .medium .password-strength-meter-bar {
+            width: 50%;
+            background-color: var(--warning-color);
+        }
+
+        .strong .password-strength-meter-bar {
+            width: 75%;
+            background-color: var(--success-color);
+        }
+
+        .very-strong .password-strength-meter-bar {
+            width: 100%;
+            background-color: var(--secondary-color);
+        }
+
+        footer {
+            background-color: white;
+            padding: 1.5rem 0;
+            border-top: 1px solid var(--medium-gray);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-text {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+
+        .footer-links a {
+            margin-left: 1rem;
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .header-container, .footer-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links, .footer-links {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .nav-links a, .footer-links a {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <header>
+            <div class="header-container">
+                <a href="{% url 'home' %}" class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>ExamGenie</span>
+                </a>
+            </div>
+        </header>
+
+        <main>
+            <div class="container">
+                <div class="form-header">
+                    <h1>Teacher Registration</h1>
+                    <p>Join our community of educators and start sharing your knowledge</p>
+                </div>
+                
+                <!-- Display Flash Message if Exists -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash-message {% if message.tags %}{{ message.tags }}{% endif %}">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <form id="teacherRegistrationForm" action="{% url 'register' %}" method="POST" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="first_name">First Name</label>
+                            <input type="text" id="first_name" name="first_name" class="form-control" required>
+                            <div class="error-message">Please enter your first name</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="last_name">Last Name</label>
+                            <input type="text" id="last_name" name="last_name" class="form-control" required>
+                            <div class="error-message">Please enter your last name</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                        <div class="error-message">Please enter a valid email address</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="specialization">Specialization</label>
+                        <input type="text" id="specialization" name="specialization" class="form-control" required>
+                        <div class="error-message">Please enter your specialization</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profile_photo">Profile Photo</label>
+                        <div class="file-upload">
+                            <div class="file-upload-preview" id="photoPreview">
+                                <i class="fas fa-user file-upload-icon"></i>
+                            </div>
+                            <label for="profile_photo" class="file-upload-label">
+                                <span class="file-upload-button">Choose Photo</span>
+                                <span class="file-name" id="fileName">No file chosen</span>
+                            </label>
+                            <input type="file" id="profile_photo" name="profile_photo" class="file-upload-input" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-field">
+                            <input type="password" id="password" name="password" class="form-control" required>
+                            <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength">
+                            <div class="password-strength-meter">
+                                <div class="password-strength-meter-bar"></div>
+                            </div>
+                            <div class="password-strength-text">Password strength: Enter a password</div>
+                        </div>
+                        <div class="error-message">Password must be at least 8 characters long</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm Password</label>
+                        <div class="password-field">
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                            <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
+                        </div>
+                        <div class="error-message">Passwords do not match</div>
+                    </div>
+
+                    <div class="form-footer">
+                        <button type="submit" class="btn-submit">Create Account</button>
+                        <p class="form-footer-text">
+                            Already have an account? <a href="{% url 'login' %}">Log in</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form validation
+            const form = document.getElementById('teacherRegistrationForm');
+            const firstNameInput = document.getElementById('first_name');
+            const lastNameInput = document.getElementById('last_name');
+            const emailInput = document.getElementById('email');
+            const specializationInput = document.getElementById('specialization');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm_password');
+            const fileInput = document.getElementById('profile_photo');
+            const fileNameDisplay = document.getElementById('fileName');
+            const photoPreview = document.getElementById('photoPreview');
+            const passwordToggles = document.querySelectorAll('.password-toggle');
+            const passwordStrengthBar = document.querySelector('.password-strength-meter-bar');
+            const passwordStrengthText = document.querySelector('.password-strength-text');
+
+            // Password visibility toggle
+            passwordToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const passwordField = this.previousElementSibling;
+                    const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordField.setAttribute('type', type);
+                    
+                    // Toggle icon
+                    const icon = this.querySelector('i');
+                    if (type === 'text') {
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    } else {
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    }
+                });
+            });
+
+            // File upload preview
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    fileNameDisplay.textContent = file.name;
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        photoPreview.innerHTML = `<img src="${e.target.result}" alt="Profile Preview">`;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    fileNameDisplay.textContent = 'No file chosen';
+                    photoPreview.innerHTML = '<i class="fas fa-user file-upload-icon"></i>';
+                }
+            });
+
+            // Password strength checker
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                let feedback = '';
+
+                if (password.length < 1) {
+                    feedback = 'Enter a password';
+                } else if (password.length < 8) {
+                    feedback = 'Weak - Too short';
+                    strength = 1;
+                } else {
+                    // Check for different character types
+                    if (password.match(/[a-z]+/)) strength += 1;
+                    if (password.match(/[A-Z]+/)) strength += 1;
+                    if (password.match(/[0-9]+/)) strength += 1;
+                    if (password.match(/[^a-zA-Z0-9]+/)) strength += 1;
+
+                    if (strength === 1) {
+                        feedback = 'Weak';
+                    } else if (strength === 2) {
+                        feedback = 'Medium';
+                    } else if (strength === 3) {
+                        feedback = 'Strong';
+                    } else {
+                        feedback = 'Very Strong';
+                    }
+                }
+
+                // Update UI
+                passwordStrengthText.textContent = `Password strength: ${feedback}`;
+                passwordStrengthBar.parentElement.className = 'password-strength-meter';
+                
+                if (strength > 0) {
+                    const strengthClass = ['', 'weak', 'medium', 'strong', 'very-strong'][strength];
+                    passwordStrengthBar.parentElement.classList.add(strengthClass);
+                }
+            });
+
+            // Form validation
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+
+                // Validate first name
+                if (!firstNameInput.value.trim()) {
+                    showError(firstNameInput, 'Please enter your first name');
+                    isValid = false;
+                } else {
+                    hideError(firstNameInput);
+                }
+
+                // Validate last name
+                if (!lastNameInput.value.trim()) {
+                    showError(lastNameInput, 'Please enter your last name');
+                    isValid = false;
+                } else {
+                    hideError(lastNameInput);
+                }
+
+                // Validate email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailInput.value.trim() || !emailRegex.test(emailInput.value.trim())) {
+                    showError(emailInput, 'Please enter a valid email address');
+                    isValid = false;
+                } else {
+                    hideError(emailInput);
+                }
+
+                // Validate specialization
+                if (!specializationInput.value.trim()) {
+                    showError(specializationInput, 'Please enter your specialization');
+                    isValid = false;
+                } else {
+                    hideError(specializationInput);
+                }
+
+                // Validate password
+                if (passwordInput.value.length < 8) {
+                    showError(passwordInput, 'Password must be at least 8 characters long');
+                    isValid = false;
+                } else {
+                    hideError(passwordInput);
+                }
+
+                // Validate confirm password
+                if (confirmPasswordInput.value !== passwordInput.value) {
+                    showError(confirmPasswordInput, 'Passwords do not match');
+                    isValid = false;
+                } else {
+                    hideError(confirmPasswordInput);
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+
+            // Helper functions for form validation
+            function showError(input, message) {
+                input.classList.add('error');
+                const errorMessage = input.parentElement.querySelector('.error-message');
+                if (errorMessage) {
+                    errorMessage.textContent = message;
+                    errorMessage.classList.add('visible');
+                }
+            }
+
+            function hideError(input) {
+                input.classList.remove('error');
+                const errorMessage = input.parentElement.querySelector('.error-message');
+                if (errorMessage) {
+                    errorMessage.classList.remove('visible');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

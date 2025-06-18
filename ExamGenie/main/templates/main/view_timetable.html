@@ -1,0 +1,651 @@
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExamGenie - Timetable</title>
+    <style>
+        /* Google Fonts Import */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            margin: 0;
+            padding: 0;
+            color: #334155;
+            min-height: 100vh;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 28px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .brand-logo {
+            font-size: 26px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo:hover {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            transform: scale(1.02);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 16px;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+            left: 10%;
+        }
+
+        /* Content Container */
+        .content-container {
+            padding: 40px 30px;
+            margin: 20px auto;
+            max-width: 1400px;
+        }
+
+        /* Page Title */
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #1e40af;
+            font-size: 2.8rem;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb, #60a5fa);
+            border-radius: 4px;
+        }
+
+        /* Table Container */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 16px;
+            padding: 25px;
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 35px;
+            transition: all 0.3s ease;
+        }
+
+        .table-container:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+            transform: translateY(-5px);
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 18px 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        th {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+        }
+
+        th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        tr:last-child td:first-child {
+            border-bottom-left-radius: 12px;
+        }
+
+        tr:last-child td:last-child {
+            border-bottom-right-radius: 12px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            position: relative;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        tbody tr:hover {
+            background-color: #e0f2fe;
+            transform: scale(1.01);
+            z-index: 1;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Time Column */
+        td:first-child {
+            font-weight: 600;
+            background-color: #f1f5f9;
+            color: #1e40af;
+        }
+
+        /* Subject Cell Styling */
+        td:not(:first-child) {
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        td:not(:first-child):hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 5;
+        }
+
+        /* Special Periods Styling */
+        td:not(:first-child):nth-child(n+2) {
+            border-left: 1px solid #f1f5f9;
+        }
+
+        td[data-content*="Lunch"], td[data-content*="lunch"] {
+            background: linear-gradient(45deg, #ffebee, #ffcdd2);
+            font-weight: 600;
+            color: #c62828;
+        }
+
+        td[data-content*="Break"], td[data-content*="break"] {
+            background: linear-gradient(45deg, #fff8e1, #ffecb3);
+            font-weight: 600;
+            color: #e65100;
+        }
+
+        /* Empty cells get a subtle styling */
+        td:empty {
+            background: repeating-linear-gradient(
+                45deg,
+                #f8fafc,
+                #f8fafc 10px,
+                #f1f5f9 10px,
+                #f1f5f9 20px
+            );
+        }
+
+        /* Button Styling */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            color: white;
+            font-size: 1.1rem;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #66bb6a, #388e3c);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(46, 125, 50, 0.3);
+        }
+
+        /* Profile Section Styling */
+        #profile-container {
+            position: relative;
+        }
+
+        .profile-pic {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.1);
+            border-color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Profile Dropdown */
+        #profile-dropdown {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            min-width: 220px;
+            z-index: 1000;
+            overflow: hidden;
+            
+            /* Animation */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        #profile-container:hover #profile-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Dropdown Links */
+        #profile-dropdown a {
+            padding: 16px 20px;
+            color: #334155;
+            text-decoration: none;
+            display: block;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        #profile-dropdown a:hover {
+            background-color: #f0f9ff;
+            color: #1e40af;
+            padding-left: 25px;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background-color: #e2e8f0;
+            margin: 0;
+        }
+
+        /* Current Day Highlight */
+        .current-day {
+            position: relative;
+        }
+
+        .current-day::before {
+            content: "Today";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 2;
+            box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Tooltip for cells */
+        td:not(:first-child) {
+            position: relative;
+        }
+
+        td:not(:first-child)::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        td:not(:first-child):hover::after {
+            opacity: 1;
+            visibility: visible;
+            bottom: 110%;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .content-container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2.4rem;
+            }
+            
+            th, td {
+                padding: 16px 18px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 12px;
+            }
+            
+            .nav-links {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+            }
+            
+            .content-container {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 30px;
+            }
+            
+            th, td {
+                padding: 14px 12px;
+                font-size: 0.95rem;
+            }
+            
+            .table-container {
+                padding: 15px;
+                border-radius: 12px;
+                margin-bottom: 25px;
+            }
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 10px;
+            }
+            
+            .brand-logo {
+                font-size: 22px;
+            }
+            
+            .nav-link {
+                padding: 6px 10px;
+                font-size: 0.9rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 25px;
+            }
+            
+            h1::after {
+                width: 80px;
+                height: 3px;
+            }
+            
+            th, td {
+                padding: 12px 10px;
+                font-size: 0.85rem;
+            }
+            
+            .table-container {
+                padding: 12px;
+                border-radius: 10px;
+            }
+            
+            .btn {
+                padding: 12px 24px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ExamGenie Navbar -->
+    <div class="navbar">
+        <!-- Left section: Brand/Logo -->
+        <div>
+            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" class="brand-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                ExamGenie
+            </a>
+        </div>
+        
+        <!-- Right section: Navigation Links + Profile -->
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+            <a href="{% url 'add_timetable' %}" class="nav-link">Back to Add Timetable</a>
+            
+            <!-- Profile Section -->
+            <div id="profile-container">
+                <!-- Profile Photo -->
+                <div id="profile-photo">
+                    <img src="{{ user.profile_photo.url }}" alt="Profile" class="profile-pic">
+                </div>
+                
+                <!-- Dropdown Menu -->
+                <div id="profile-dropdown">
+                    <a href="{% url 'profile' %}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px; vertical-align: text-bottom;">
+                            <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Profile
+                    </a>
+                    <div class="divider"></div>
+                    <a href="{% url 'logout' %}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px; vertical-align: text-bottom;">
+                            <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-container">
+        <h1>Daily Timetable</h1>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        {% for day in days %}
+                        <th {% if day == current_day %}class="current-day"{% endif %}>{{ day }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for slot in time_slots %}
+                    <tr>
+                        <td>{{ slot }}</td>
+                        {% for day in days %}
+                        <td data-content="{{ timetable_data|get_item:day|get_item:slot }}" title="{{ timetable_data|get_item:day|get_item:slot }}">
+                            {{ timetable_data|get_item:day|get_item:slot }}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="button-container">
+            <a href="{% url 'add_timetable' %}" class="btn btn-secondary">Back to Timetable Builder</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-primary">Return to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Script for dropdown functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle dropdown when clicking profile photo
+            const profilePhoto = document.getElementById('profile-photo');
+            const dropdown = document.getElementById('profile-dropdown');
+            
+            profilePhoto.addEventListener('click', function(event) {
+                event.stopPropagation(); // Prevent event from bubbling up
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!profilePhoto.contains(event.target) && !dropdown.contains(event.target)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+            
+            // Mark current day of the week
+            const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+            const dayHeaders = document.querySelectorAll('th');
+            
+            dayHeaders.forEach(header => {
+                if (header.textContent.trim() === today) {
+                    header.classList.add('current-day');
+                }
+            });
+            
+            // Add special styling for break periods
+            const cells = document.querySelectorAll('tbody td:not(:first-child)');
+            cells.forEach(cell => {
+                const content = cell.textContent.trim().toLowerCase();
+                if (content.includes('lunch') || content.includes('break')) {
+                    cell.setAttribute('data-content', content);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

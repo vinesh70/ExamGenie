@@ -1,0 +1,16 @@
+{% extends "main/pdf_base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="mb-4">Question Paper Generator</h1>
+            <p class="lead">Generate customized question papers for exams using AI</p>
+            <div class="mt-5">
+                <a href="{% url 'upload_files' %}" class="btn btn-primary btn-lg me-3">Generate Paper</a>
+                <a href="{% url 'upload_question_paper' %}" class="btn btn-success btn-lg">Generate Answers</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

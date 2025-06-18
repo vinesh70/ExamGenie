@@ -1,0 +1,139 @@
+{% extends "main/pdf_base.html" %}
+
+{% block content %}
+
+
+
+<!-- ExamGenie Navbar -->
+<div style="background-color: #1a73e8; color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; width: 100%;">
+    <!-- Brand/Logo -->
+    <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" id="examgenie-brand" style="font-size: 24px; font-weight: bold; color: white; text-decoration: none; cursor: pointer;">
+      ExamGenie
+    </a>
+    
+    <a href="{% url 'dashboard' %}" class="nav-item" style="color: white; text-decoration: none; margin: 0 15px;">
+      Dashboard
+    </a>
+    
+    <!-- Profile Section -->
+    <div id="profile-container" style="position: relative; display: flex; align-items: center;">
+      <!-- Profile Photo -->
+      <div id="profile-photo" style="cursor: pointer;">
+        <img src="{{ user.profile_photo.url }}" alt="Profile" class="profile-pic" style="width: 40px; height: 40px; border-radius: 50%;">
+      </div>
+      
+      <!-- Dropdown Menu -->
+      <div id="profile-dropdown" style="position: absolute; top: 100%; right: 0; background-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2); border-radius: 4px; display: none; min-width: 150px; margin-top: 5px; z-index: 1001;">
+        <a href="{% url 'profile' %}" style="display: block; padding: 10px 15px; color: #333; text-decoration: none;">Profile</a>
+        <div class="divider" style="height: 1px; background-color: #eee;"></div>
+        <a href="{% url 'logout' %}" style="display: block; padding: 10px 15px; color: #333; text-decoration: none;">Logout</a>
+      </div>
+    </div>
+  </div>
+
+
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Question Paper Preview</h3>
+                    <div>
+                        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#saveQuestionPaperModal">
+                            Save Question Paper
+                        </button>
+                        <a href="{% url 'download_paper' %}" class="btn btn-success">Download PDF</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <h2 class="mb-2">Vidyalankar Institute of Technology</h2>
+                        <h4>Semester {{ exam_data.semester }} - {{ exam_data.branch }} - {% if exam_data.pdf_type == 'mse' %}Mid{% else %}End{% endif %} Semester Assessment</h4>
+                        <h4>{{ exam_data.subject }}</h4>
+                        <p>Exam Date: {{ exam_data.exam_date }} | Time: {{ exam_data.exam_time }}</p>
+                        <p>{% if exam_data.pdf_type == 'mse' %}30{% else %}50{% endif %} Marks / {% if exam_data.pdf_type == 'mse' %}1{% else %}2{% endif %} hour(s)</p>
+                    </div>
+                    
+                    <hr>
+                    
+                    {% for q_num, q_content in questions.items %}
+                    <div class="mb-4">
+                        <h5>{{ q_num }}) {{ q_content.instruction }}</h5>
+                        <div class="ms-4">
+                            {% for question in q_content.questions %}
+                            <div class="mb-2">
+                                <strong>
+                                {% if forloop.counter == 1 %}A
+                                {% elif forloop.counter == 2 %}B
+                                {% elif forloop.counter == 3 %}C
+                                {% elif forloop.counter == 4 %}D
+                                {% elif forloop.counter == 5 %}E
+                                {% else %}{{ forloop.counter }}
+                                {% endif %}
+                                )</strong> {{ question }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Save Question Paper Modal -->
+<div class="modal fade" id="saveQuestionPaperModal" tabindex="-1" aria-labelledby="saveQuestionPaperModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveQuestionPaperModalLabel">Save Question Paper</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'save_question_paper' %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="question_paper_name" class="form-label">Question Paper Name</label>
+                        <input type="text" class="form-control" id="question_paper_name" name="question_paper_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject_code" class="form-label">Subject Code</label>
+                        <input type="text" class="form-control" id="subject_code" name="subject_code" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block extra_js %}
+<!-- Make sure this script is placed at the end of the body -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Toggle dropdown when clicking profile photo
+      const profilePhoto = document.getElementById('profile-photo');
+      const dropdown = document.getElementById('profile-dropdown');
+      
+      profilePhoto.addEventListener('click', function(event) {
+        event.stopPropagation(); // Prevent event from bubbling up
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(event) {
+        if (!profilePhoto.contains(event.target) && !dropdown.contains(event.target)) {
+          dropdown.style.display = 'none';
+        }
+      });
+    });
+  </script>
+{% endblock %}

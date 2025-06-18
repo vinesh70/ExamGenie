@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Completed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        :root {
+            --primary-color: #4f46e5;
+            --success-color: #10b981;
+            --accent-color: #8b5cf6;
+            --text-dark: #1f2937;
+            --text-medium: #4b5563;
+            --text-light: #6b7280;
+            --bg-gradient-start: #c7d2fe;
+            --bg-gradient-end: #e0e7ff;
+            --card-bg: #ffffff;
+            --shadow-color: rgba(79, 70, 229, 0.15);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px var(--shadow-color);
+            animation: fadeUp 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .subtitle {
+            color: var(--text-medium);
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+        
+        /* Results */
+        .results {
+            background: rgba(224, 231, 255, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(203, 213, 225, 0.5);
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: var(--text-medium);
+        }
+        
+        .result-value {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        /* Score Section */
+        .score-section {
+            text-align: center;
+            padding: 30px 0 20px;
+        }
+        
+        .score-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-medium);
+            margin-bottom: 15px;
+        }
+        
+        .score-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--success-color);
+            margin-bottom: 10px;
+        }
+        
+        .score-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+        
+        /* Confetti Animation */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-color);
+            opacity: 0;
+        }
+        
+        /* Animations */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes floatConfetti {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) rotate(360deg);
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                border-radius: 16px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .subtitle {
+                font-size: 14px;
+            }
+            
+            .results {
+                padding: 20px;
+            }
+            
+            .score-value {
+                font-size: 30px;
+            }
+        }
+        
+        /* Custom Badge for Perfect Score */
+        .perfect-score {
+            position: relative;
+        }
+        
+        .perfect-score::after {
+            content: '★';
+            display: inline-block;
+            margin-left: 5px;
+            color: #fbbf24;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create confetti effect
+            const colors = ['#4f46e5', '#10b981', '#8b5cf6', '#ec4899', '#f59e0b'];
+            const container = document.querySelector('.container');
+            
+            for (let i = 0; i < 50; i++) {
+                createConfetti(container, colors);
+            }
+            
+            // Check if perfect score to add special class
+            const scoreElement = document.querySelector('#score-value');
+            const scoreText = scoreElement.textContent;
+            const [scored, total] = scoreText.split('/').map(s => parseInt(s.trim()));
+            
+            if (scored === total) {
+                scoreElement.classList.add('perfect-score');
+            }
+            
+            // Calculate percentage
+            const percentage = Math.round((scored / total) * 100);
+            const badgeElement = document.querySelector('.score-badge');
+            badgeElement.textContent = `${percentage}% Completion`;
+        });
+        
+        function createConfetti(container, colors) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            
+            // Random position
+            const startPositionX = Math.random() * container.offsetWidth;
+            
+            // Random color
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Random size
+            const size = Math.floor(Math.random() * 10) + 5;
+            
+            // Set properties
+            confetti.style.left = `${startPositionX}px`;
+            confetti.style.top = `0px`;
+            confetti.style.backgroundColor = color;
+            confetti.style.width = `${size}px`;
+            confetti.style.height = `${size}px`;
+            confetti.style.position = 'absolute';
+            confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+            
+            // Set animation
+            confetti.style.animation = `floatConfetti ${Math.random() * 3 + 2}s ease-out forwards`;
+            confetti.style.animationDelay = `${Math.random() * 5}s`;
+            
+            // Add to container
+            container.appendChild(confetti);
+            
+            // Remove after animation completes
+            setTimeout(() => {
+                confetti.remove();
+            }, 8000);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Quiz Completed Successfully! 🎉</h1>
+            <p class="subtitle">Great job completing the quiz. Here's your result summary.</p>
+        </div>
+        
+        <div class="results">
+            <div class="result-item">
+                <span class="result-label">Name</span>
+                <span class="result-value">{{ attempt.first_name }} {{ attempt.last_name }}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Quiz Title</span>
+                <span class="result-value">{{ attempt.quiz.title }}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Time Taken</span>
+                <span class="result-value">{{ attempt.total_time_taken }}</span>
+            </div>
+        </div>
+        
+        <div class="score-section">
+            <div class="score-title">Your Score</div>
+            <div class="score-value" id="score-value">{{ attempt.score }} / {{ attempt.quiz.questions.count }}</div>
+            <div class="score-badge">Calculating...</div>
+        </div>
+        
+        <div class="footer">
+            Thank you for participating in this quiz.
+        </div>
+    </div>
+</body>
+</html>

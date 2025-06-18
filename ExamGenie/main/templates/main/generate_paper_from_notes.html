@@ -1,0 +1,232 @@
+{% extends "main/pdf_base.html" %}
+
+{% block content %}
+
+
+
+
+<!-- ExamGenie Navbar -->
+<div style="background-color: #1a73e8; color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; width: 100%;">
+    <!-- Brand/Logo -->
+    <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" id="examgenie-brand" style="font-size: 24px; font-weight: bold; color: white; text-decoration: none; cursor: pointer;">
+      ExamGenie
+    </a>
+    
+    <a href="{% url 'dashboard' %}" class="nav-item" style="color: white; text-decoration: none; margin: 0 15px;">
+      Dashboard
+    </a>
+    
+    <!-- Profile Section -->
+    <div id="profile-container" style="position: relative; display: flex; align-items: center;">
+      <!-- Profile Photo -->
+      <div id="profile-photo" style="cursor: pointer;">
+        <img src="{{ user.profile_photo.url }}" alt="Profile" class="profile-pic" style="width: 40px; height: 40px; border-radius: 50%;">
+      </div>
+      
+      <!-- Dropdown Menu -->
+      <div id="profile-dropdown" style="position: absolute; top: 100%; right: 0; background-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2); border-radius: 4px; display: none; min-width: 150px; margin-top: 5px; z-index: 1001;">
+        <a href="{% url 'profile' %}" style="display: block; padding: 10px 15px; color: #333; text-decoration: none;">Profile</a>
+        <div class="divider" style="height: 1px; background-color: #eee;"></div>
+        <a href="{% url 'logout' %}" style="display: block; padding: 10px 15px; color: #333; text-decoration: none;">Logout</a>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Configure Exam Paper</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="semester" class="form-label">Semester</label>
+                                <select id="semester" name="semester">
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                    <option value="3">Semester 3</option>
+                                    <option value="4">Semester 4</option>
+                                    <option value="5">Semester 5</option>
+                                    <option value="6">Semester 6</option>
+                                    <option value="7">Semester 7</option>
+                                    <option value="8">Semester 8</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="branch" class="form-label">Branch</label>
+                                <select id="branch" name="branch">
+                                    <option value="Computer Science">Computer Science</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Mechanical">Mechanical</option>
+                                    <option value="INFT">Information Technology</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="exam_date" class="form-label">Exam Date</label>
+                                <input type="date" class="form-control" id="exam_date" name="exam_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="exam_time" class="form-label">Exam Time</label>
+                                <input type="time" class="form-control" id="exam_time" name="exam_time" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="pdf_type" class="form-label">Exam Type</label>
+                                <select class="form-select" id="pdf_type" name="pdf_type" required>
+                                    <option value="mse">Mid Semester Exam (MSE)</option>
+                                    <option value="ese">End Semester Exam (ESE)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="avoid_duplicates" class="form-label">Avoid Duplicates</label>
+                                <select class="form-select" id="avoid_duplicates" name="avoid_duplicates">
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        <h4 class="mb-3">Question Configuration</h4>
+                        
+                        <!-- Question configuration will be dynamically generated based on selection -->
+                        <div id="questionConfig">
+                            <!-- Default to MSE (3 questions) -->
+                            {% for i in "123" %}
+                            <div class="card mb-3 question-card" id="q{{ forloop.counter }}_card">
+                                <div class="card-header">
+                                    Question {{ forloop.counter }}
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="q{{ forloop.counter }}_type" class="form-label">Question Type</label>
+                                            <select class="form-select" id="q{{ forloop.counter }}_type" name="q{{ forloop.counter }}_type" required>
+                                                <option value="2">2 Marks</option>
+                                                <option value="5">5 Marks</option>
+                                                <option value="10">10 Marks</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="q{{ forloop.counter }}_difficulty" class="form-label">Difficulty Level</label>
+                                            <select class="form-select" id="q{{ forloop.counter }}_difficulty" name="q{{ forloop.counter }}_difficulty" required>
+                                                <option value="easy">Easy</option>
+                                                <option value="moderate">Moderate</option>
+                                                <option value="hard">Hard</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            
+                            <!-- Hidden ESE questions (4 and 5) initially -->
+                            {% for i in "45" %}
+                            <div class="card mb-3 question-card ese-question" id="q{{ forloop.counter|add:"3" }}_card" style="display: none;">
+                                <div class="card-header">
+                                    Question {{ forloop.counter|add:"3" }}
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="q{{ forloop.counter|add:"3" }}_type" class="form-label">Question Type</label>
+                                            <select class="form-select" id="q{{ forloop.counter|add:"3" }}_type" name="q{{ forloop.counter|add:"3" }}_type">
+                                                <option value="2">2 Marks</option>
+                                                <option value="5">5 Marks</option>
+                                                <option value="10">10 Marks</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="q{{ forloop.counter|add:"3" }}_difficulty" class="form-label">Difficulty Level</label>
+                                            <select class="form-select" id="q{{ forloop.counter|add:"3" }}_difficulty" name="q{{ forloop.counter|add:"3" }}_difficulty">
+                                                <option value="easy">Easy</option>
+                                                <option value="moderate">Moderate</option>
+                                                <option value="hard">Hard</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="text-end mt-4">
+                            <button type="submit" class="btn btn-primary">Generate Paper</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const examTypeSelect = document.getElementById('pdf_type');
+    const eseQuestions = document.querySelectorAll('.ese-question');
+    
+    // Toggle ESE questions visibility based on exam type
+    examTypeSelect.addEventListener('change', function() {
+        if (this.value === 'ese') {
+            eseQuestions.forEach(el => el.style.display = 'block');
+            eseQuestions.forEach(el => {
+                const inputs = el.querySelectorAll('select');
+                inputs.forEach(input => input.required = true);
+            });
+        } else {
+            eseQuestions.forEach(el => el.style.display = 'none');
+            eseQuestions.forEach(el => {
+                const inputs = el.querySelectorAll('select');
+                inputs.forEach(input => input.required = false);
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+{% block extra_js %}
+<!-- Make sure this script is placed at the end of the body -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Toggle dropdown when clicking profile photo
+      const profilePhoto = document.getElementById('profile-photo');
+      const dropdown = document.getElementById('profile-dropdown');
+      
+      profilePhoto.addEventListener('click', function(event) {
+        event.stopPropagation(); // Prevent event from bubbling up
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(event) {
+        if (!profilePhoto.contains(event.target) && !dropdown.contains(event.target)) {
+          dropdown.style.display = 'none';
+        }
+      });
+    });
+  </script>
+{% endblock %}

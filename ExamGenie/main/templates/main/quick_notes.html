@@ -1,0 +1,231 @@
+{% extends 'main/pdf_base.html' %}
+{% block content %}
+
+
+
+<!-- ExamGenie Navbar -->
+<div style="background-color: #1a73e8; color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; width: 100%;">
+  <!-- Brand/Logo -->
+  <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" id="examgenie-brand" style="font-size: 24px; font-weight: bold; color: white; text-decoration: none; cursor: pointer;">
+    ExamGenie
+  </a>
+  
+  <a href="{% url 'dashboard' %}" class="nav-item" style="color: white; text-decoration: none; margin: 0 15px;">
+    Dashboard
+  </a>
+  
+  <!-- Profile Section -->
+  <div id="profile-container" style="position: relative; display: flex; align-items: center;">
+    <!-- Profile Photo -->
+    <div id="profile-photo" style="cursor: pointer;">
+      <img src="{{ user.profile_photo.url }}" alt="Profile" class="profile-pic" style="width: 40px; height: 40px; border-radius: 50%;">
+    </div>
+    
+    <!-- Dropdown Menu -->
+    <div id="profile-dropdown" style="position: absolute; top: 100%; right: 0; background-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2); border-radius: 4px; display: none; min-width: 150px; margin-top: 5px; z-index: 1001;">
+      <a href="{% url 'profile' %}" style="display: block; padding: 10px 15px; color: #333; text-decoration: none;">Profile</a>
+      <div class="divider" style="height: 1px; background-color: #eee;"></div>
+      <a href="{% url 'logout' %}" style="display: block; padding: 10px 15px; color: #333; text-decoration: none;">Logout</a>
+    </div>
+  </div>
+</div>
+
+
+<div class="container mt-4">
+  <h2>Quick Notes</h2>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Files</h5>
+        </div>
+        <div class="card-body">
+          <div class="input-group mb-3">
+            <input type="text" id="fileNameInput" class="form-control" placeholder="New file name">
+            &nbsp;  &nbsp;
+            <button class="btn btn-primary" id="createFileBtn">Create</button>
+          </div>
+          <ul class="list-group" id="filesList">
+            <!-- Files will be listed here -->
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 id="currentFileName">No file selected</h5>
+        </div>
+        <div class="card-body">
+          <textarea id="noteContent" class="form-control" rows="15" placeholder="Start typing your notes here..." disabled></textarea>
+        </div>
+        <div class="card-footer">
+          <button id="saveNoteBtn" class="btn btn-success me-2" disabled>Save</button>
+          <form id="downloadForm" action="{% url 'download_note' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" id="downloadFileName" name="file_name" value="">
+            <input type="hidden" id="downloadContent" name="content" value="">
+            <button id="downloadBtn" class="btn btn-info me-2" type="submit" disabled>Download as Word</button>
+          </form>
+          <button id="deleteFileBtn" class="btn btn-danger float-end" disabled>Delete File</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const fileNameInput = document.getElementById('fileNameInput');
+    const createFileBtn = document.getElementById('createFileBtn');
+    const filesList = document.getElementById('filesList');
+    const currentFileName = document.getElementById('currentFileName');
+    const noteContent = document.getElementById('noteContent');
+    const saveNoteBtn = document.getElementById('saveNoteBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const downloadForm = document.getElementById('downloadForm');
+    const downloadFileName = document.getElementById('downloadFileName');
+    const downloadContent = document.getElementById('downloadContent');
+    const deleteFileBtn = document.getElementById('deleteFileBtn');
+    
+    // Current active file
+    let activeFile = null;
+    
+    // Initialize notes storage if not exists
+    if (!localStorage.getItem('teacherNotes')) {
+      localStorage.setItem('teacherNotes', JSON.stringify({}));
+    }
+    
+    // Load files on page load
+    loadFiles();
+    
+    // Create new file
+    createFileBtn.addEventListener('click', function() {
+      const fileName = fileNameInput.value.trim();
+      if (fileName) {
+        const notes = JSON.parse(localStorage.getItem('teacherNotes'));
+        if (!notes[fileName]) {
+          notes[fileName] = "";
+          localStorage.setItem('teacherNotes', JSON.stringify(notes));
+          fileNameInput.value = '';
+          loadFiles();
+          selectFile(fileName);
+        } else {
+          alert('A file with this name already exists!');
+        }
+      }
+    });
+    
+    // Save note content
+    saveNoteBtn.addEventListener('click', function() {
+      if (activeFile) {
+        const notes = JSON.parse(localStorage.getItem('teacherNotes'));
+        notes[activeFile] = noteContent.value;
+        localStorage.setItem('teacherNotes', JSON.stringify(notes));
+        alert('Note saved successfully!');
+      }
+    });
+    
+    // Set form values before submission
+    downloadForm.addEventListener('submit', function(e) {
+      if (activeFile) {
+        downloadFileName.value = activeFile;
+        downloadContent.value = noteContent.value;
+      } else {
+        e.preventDefault();
+      }
+    });
+    
+    // Delete file
+    deleteFileBtn.addEventListener('click', function() {
+      if (activeFile) {
+        if (confirm(`Are you sure you want to delete "${activeFile}"?`)) {
+          const notes = JSON.parse(localStorage.getItem('teacherNotes'));
+          delete notes[activeFile];
+          localStorage.setItem('teacherNotes', JSON.stringify(notes));
+          activeFile = null;
+          loadFiles();
+          resetEditor();
+        }
+      }
+    });
+    
+    // Load files from localStorage
+    function loadFiles() {
+      const notes = JSON.parse(localStorage.getItem('teacherNotes'));
+      filesList.innerHTML = '';
+      
+      Object.keys(notes).forEach(fileName => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item list-group-item-action';
+        li.textContent = fileName;
+        li.addEventListener('click', function() {
+          selectFile(fileName);
+        });
+        
+        if (fileName === activeFile) {
+          li.classList.add('active');
+        }
+        
+        filesList.appendChild(li);
+      });
+    }
+    
+    // Select a file and load its content
+    function selectFile(fileName) {
+      activeFile = fileName;
+      currentFileName.textContent = fileName;
+      
+      const notes = JSON.parse(localStorage.getItem('teacherNotes'));
+      noteContent.value = notes[fileName];
+      noteContent.disabled = false;
+      saveNoteBtn.disabled = false;
+      downloadBtn.disabled = false;
+      deleteFileBtn.disabled = false;
+      
+      // Remove active class from all files
+      document.querySelectorAll('#filesList li').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      // Add active class to selected file
+      Array.from(filesList.children).find(li => li.textContent === fileName)?.classList.add('active');
+    }
+    
+    // Reset editor when no file is selected
+    function resetEditor() {
+      currentFileName.textContent = 'No file selected';
+      noteContent.value = '';
+      noteContent.disabled = true;
+      saveNoteBtn.disabled = true;
+      downloadBtn.disabled = true;
+      deleteFileBtn.disabled = true;
+    }
+  });
+</script>
+{% endblock %}
+
+
+{% block extra_js %}
+<!-- Make sure this script is placed at the end of the body -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Toggle dropdown when clicking profile photo
+      const profilePhoto = document.getElementById('profile-photo');
+      const dropdown = document.getElementById('profile-dropdown');
+      
+      profilePhoto.addEventListener('click', function(event) {
+        event.stopPropagation(); // Prevent event from bubbling up
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(event) {
+        if (!profilePhoto.contains(event.target) && !dropdown.contains(event.target)) {
+          dropdown.style.display = 'none';
+        }
+      });
+    });
+  </script>
+{% endblock %}

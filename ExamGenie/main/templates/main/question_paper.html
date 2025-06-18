@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load qc %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Question Paper</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h2, h3 {
+            margin: 0;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+        }
+        p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        
+        /* Navbar styling - keeping the original with sticky */
+        #navbar-container {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+        
+        /* Container for the question paper */
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .container:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .paper-details {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .paper-details:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Question Section Styles - Improved */
+        .question-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .question-section:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-section hr {
+            border: 1px solid #eee;
+            margin-top: 20px;
+        }
+
+        .question-section h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .question-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .question-item {
+            margin-bottom: 15px;
+            font-size: 16px;
+            line-height: 1.6;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .question-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .question-item strong {
+            font-weight: bold;
+            color: #1a73e8;
+        }
+        
+        /* Textarea styling */
+        textarea {
+            width: 80%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            border-color: #1a73e8;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        /* Button Styles - Improved */
+        .controller {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .controller button {
+            background-color: #1a73e8;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .controller button:hover {
+            background-color: #0d62c9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .controller button:active {
+            transform: translateY(0);
+        }
+
+        /* Profile Section Styling - keeping original */
+        #profile-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        
+        /* Profile Dropdown */
+        #profile-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            min-width: 150px;
+            z-index: 1000;
+            
+            /* Initially hidden */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+        }
+        
+        /* Show dropdown on hover */
+        #profile-container:hover #profile-dropdown {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Dropdown Links */
+        #profile-dropdown a {
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
+        }
+        
+        #profile-dropdown a:hover {
+            background-color: #f1f1f1;
+        }
+        
+        /* Divider */
+        .divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 0;
+        }
+
+        .nav-item {
+            background-color: #1a73e8;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            display: inline-block;
+            position: absolute;
+            right: 100px; /* Adjust distance from the right */
+            top: 4%
+            transform: translateY(-50%); /* Centers it vertically */
+        }
+
+        .nav-item1 {
+            background-color: #1a73e8;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            display: inline-block;
+            position: absolute;
+            right: 230px; /* Adjust distance from the right */
+            top: 4%
+            transform: translateY(-50%); /* Centers it vertically */
+        }
+        
+        /* Messages styling */
+        .messages {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        
+        .messages li {
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .messages .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .messages .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .messages .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        /* Responsive Styles - Enhanced */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 20px;
+            }
+
+            .controller button {
+                width: 100%;
+                padding: 12px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+
+            .question-item {
+                font-size: 14px;
+            }
+            
+            textarea {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h3 {
+                font-size: 18px;
+            }
+
+            .question-item {
+                font-size: 14px;
+            }
+            
+            .controller {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <script>
+        // Function to capture the edited content and send it for PDF download
+        function downloadEditedPaper() {
+            // Create a form to submit all edited content
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{% url "download_question_paper" %}';
+            
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = '{{ csrf_token }}';
+            form.appendChild(csrfInput);
+            
+            // Get all textareas and add them to the form with their question IDs
+            const textareas = document.querySelectorAll('textarea[data-question-id]');
+            textareas.forEach(textarea => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'edited_questions[' + textarea.dataset.questionId + ']';
+                input.value = textarea.value;
+                form.appendChild(input);
+            });
+            
+            // Add to document, submit, and remove
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+    </script>
+</head>
+<body>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- ExamGenie Navbar - Wrapped in a container to make sticky -->
+    <div id="navbar-container">
+        <div style="background-color: #1a73e8; color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <!-- Brand/Logo -->
+            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" 
+               id="examgenie-brand" 
+               style="font-size: 24px; font-weight: bold; color: white; text-decoration: none; cursor: pointer;">
+                ExamGenie
+            </a>
+          
+            <a href="{% url 'dashboard' %}" class="nav-item">
+              Dashboard
+            </a>
+            
+            <!-- Profile Section -->
+            <div id="profile-container">
+                <!-- Profile Photo -->
+                <div id="profile-photo">
+                    <img src="{{ user.profile_photo.url }}" alt="Profile" class="profile-pic">
+                </div>
+                
+                <!-- Dropdown Menu -->
+                <div id="profile-dropdown">
+                    <a href="{% url 'profile' %}">Profile</a>
+                    <div class="divider"></div>
+                    <a href="{% url 'logout' %}">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Generated Question Paper</h2>
+
+        <div class="paper-details">
+            <p><strong>Subject:</strong> {{ subject_name }} ({{ subject_code }})</p>
+            <p><strong>Semester:</strong> {{ semester }}</p>
+            <p><strong>Exam Type:</strong> {{ exam_type }}</p>
+            <p><strong>Exam Date:</strong> {{ exam_date }}</p>
+            <p><strong>Exam Time:</strong> {{ exam_time }}</p>
+        </div>
+
+        <hr>
+
+        <div id="question-paper-content">
+            {% for section_key, section in questions.items %}
+                <div class="question-section">
+                    <h3>{{ section_key|upper }}) {{ section.instruction }}</h3>
+                    <div class="question-list">
+                        {% for q in section.questions %}
+                            <div class="question-item">
+                                <strong>{{ q.label }}</strong>
+                                <textarea data-question-id="{{ q.id }}" data-section="{{ section_key }}" data-index="{{ forloop.counter0 }}" rows="2" style="width: 80%;">{{ q.question }}</textarea> ({{ q.marks }} marks)
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="controller">
+            <button onclick="window.location.href='{% url 'generate_paper' %}?regenerate=true'">Generate Again</button>
+            <button onclick="downloadEditedPaper()">Download as PDF</button>
+        </div>
+    </div>
+</body>
+</html>

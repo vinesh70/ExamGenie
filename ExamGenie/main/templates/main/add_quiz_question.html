@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Add Questions to Quiz</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --primary-dark: #0d5bba;
+            --secondary-color: #28a745;
+            --secondary-dark: #218838;
+            --light-bg: #f8f9fa;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 70px; /* Space for fixed navbar */
+        }
+
+        /* Improved Navbar */
+        .navbar {
+            background-color: var(--primary-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            padding: 12px 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            transition: background-color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Profile Section Styling */
+        .profile-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            cursor: pointer;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            min-width: 180px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 0;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 800px;
+            background: white;
+            padding: 32px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin: 24px auto;
+        }
+
+        h2 {
+            text-align: center;
+            font-weight: 700;
+            color: #343a40;
+            margin-bottom: 28px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h2:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+
+        /* Form Elements */
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border-radius: var(--border-radius);
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ced4da;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.25);
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background-color: var(--secondary-color);
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Questions List */
+        #questions-list, #quiz-link-container {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-top: 32px;
+        }
+
+        #question-items {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #question-items li {
+            background: #f0f2f5;
+            padding: 16px;
+            margin: 10px 0;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        h4 {
+            color: #343a40;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        /* Quiz Link Section */
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+
+        #quiz-link {
+            flex-grow: 1;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            font-size: 14px;
+        }
+
+        #copy-link {
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            background-color: white;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            transition: all 0.3s;
+        }
+
+        #copy-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .text-muted {
+            font-size: 14px;
+            margin-top: 8px;
+            display: block;
+        }
+
+        /* Animation for alerts */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert {
+            animation: fadeIn 0.3s ease-out;
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+        }
+
+        /* Form validation styling */
+        .invalid-feedback {
+            display: none;
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #dc3545;
+        }
+
+        .was-validated .form-control:invalid,
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 0.75rem);
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        .was-validated .form-control:invalid:focus,
+        .form-control.is-invalid:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
+
+        .was-validated .form-control:invalid ~ .invalid-feedback,
+        .form-control.is-invalid ~ .invalid-feedback {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Improved Navbar -->
+    <nav class="navbar">
+        <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" class="navbar-brand">
+            ExamGenie
+        </a>
+        
+        <div class="nav-links">
+            <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+            
+            <div class="profile-container">
+                <img src="{{ user.profile_photo.url }}" alt="Profile" id="profile-pic" class="profile-pic">
+                
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <a href="{% url 'profile' %}" class="dropdown-item">Profile</a>
+                    <div class="divider"></div>
+                    <a href="{% url 'logout' %}" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <h2>Add Questions to "{{ quiz.title }}"</h2>
+
+        <!-- Alert container for form validation messages -->
+        <div id="form-alerts"></div>
+
+        <form id="question-form" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Question:</label>
+                <textarea name="question" id="question" class="form-control" required></textarea>
+                <div class="invalid-feedback">
+                    Please enter a question.
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Option 1:</label>
+                <input type="text" name="option_1" id="option_1" class="form-control" required>
+                <div class="invalid-feedback">
+                    Please enter option 1.
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Option 2:</label>
+                <input type="text" name="option_2" id="option_2" class="form-control" required>
+                <div class="invalid-feedback">
+                    Please enter option 2.
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Option 3:</label>
+                <input type="text" name="option_3" id="option_3" class="form-control" required>
+                <div class="invalid-feedback">
+                    Please enter option 3.
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Option 4:</label>
+                <input type="text" name="option_4" id="option_4" class="form-control" required>
+                <div class="invalid-feedback">
+                    Please enter option 4.
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Correct Option:</label>
+                <select name="correct_option" id="correct_option" class="form-control" required>
+                    <option value="">Select the Correct Option</option>
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
+                    <option value="3">Option 3</option>
+                    <option value="4">Option 4</option>
+                </select>
+                <div class="invalid-feedback">
+                    Please select the correct option.
+                </div>
+            </div>
+            <div class="d-flex gap-3">
+                <button type="button" id="add-question" class="btn btn-success">Add Question</button>
+                <button type="button" id="generate-quiz" class="btn btn-primary" data-quiz-id="{{ quiz.id }}">Generate Quiz</button>
+            </div>
+        </form>
+
+        <div id="questions-list">
+            <h4>Questions Added:</h4>
+            <ul id="question-items"></ul>
+        </div>
+
+        <!-- QUIZ LINK SECTION -->
+        <div id="quiz-link-container" style="display: none;">
+            <h4>Quiz Link:</h4>
+            <div class="input-group">
+                <input type="text" id="quiz-link" class="form-control" readonly>
+                <button class="btn" id="copy-link">Copy</button>
+            </div>
+            <small class="text-muted">Copy this link and send it to students.</small>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Toggle dropdown when clicking profile photo
+            const profilePic = document.getElementById('profile-pic');
+            const dropdown = document.getElementById('profile-dropdown');
+            
+            profilePic.addEventListener('click', function(event) {
+                event.stopPropagation();
+                dropdown.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!profilePic.contains(event.target) && !dropdown.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+
+            // Form validation function
+            function validateQuestionForm() {
+                let isValid = true;
+                const question = $("#question").val().trim();
+                const option1 = $("#option_1").val().trim();
+                const option2 = $("#option_2").val().trim();
+                const option3 = $("#option_3").val().trim();
+                const option4 = $("#option_4").val().trim();
+                const correctOption = $("#correct_option").val();
+                
+                // Clear previous validation states
+                $(".form-control").removeClass("is-invalid");
+                
+                // Validate each field
+                if (!question) {
+                    $("#question").addClass("is-invalid");
+                    isValid = false;
+                }
+                
+                if (!option1) {
+                    $("#option_1").addClass("is-invalid");
+                    isValid = false;
+                }
+                
+                if (!option2) {
+                    $("#option_2").addClass("is-invalid");
+                    isValid = false;
+                }
+                
+                if (!option3) {
+                    $("#option_3").addClass("is-invalid");
+                    isValid = false;
+                }
+                
+                if (!option4) {
+                    $("#option_4").addClass("is-invalid");
+                    isValid = false;
+                }
+                
+                if (!correctOption || correctOption === "") {
+                    $("#correct_option").addClass("is-invalid");
+                    isValid = false;
+                }
+                
+                return isValid;
+            }
+
+            // Add question functionality
+            $("#add-question").click(function () {
+                // Validate form before proceeding
+                if (!validateQuestionForm()) {
+                    // Show validation error message
+                    $("#form-alerts").html(`
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            Please fill in all required fields.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                    return;
+                }
+                
+                let formData = {
+                    "question": $("#question").val().trim(),
+                    "option_1": $("#option_1").val().trim(),
+                    "option_2": $("#option_2").val().trim(),
+                    "option_3": $("#option_3").val().trim(),
+                    "option_4": $("#option_4").val().trim(),
+                    "correct_option": $("#correct_option").val(),
+                    "csrfmiddlewaretoken": $("input[name=csrfmiddlewaretoken]").val()
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: window.location.href,
+                    data: formData,
+                    success: function (response) {
+                        // Create a dismissible alert for feedback
+                        const alertElement = $(`<div class="alert alert-success alert-dismissible fade show" role="alert">
+                            ${response.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>`);
+                        
+                        // Add alert to the form alerts container
+                        $("#form-alerts").html(alertElement);
+                        
+                        // Auto dismiss after 3 seconds
+                        setTimeout(function() {
+                            alertElement.fadeOut(300, function() {
+                                $(this).remove();
+                            });
+                        }, 3000);
+                        
+                        // Add question to list
+                        $("#question-items").append(`<li>${formData.question}</li>`);
+
+                        // Clear form fields after adding question
+                        $("#question").val("");
+                        $("#option_1").val("");
+                        $("#option_2").val("");
+                        $("#option_3").val("");
+                        $("#option_4").val("");
+                        $("#correct_option").val("");
+                        
+                        // Remove validation classes
+                        $(".form-control").removeClass("is-invalid");
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error response
+                        const errorMessage = xhr.responseJSON && xhr.responseJSON.error ? 
+                            xhr.responseJSON.error : "An error occurred while adding the question.";
+                            
+                        $("#form-alerts").html(`
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                ${errorMessage}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        `);
+                    }
+                });
+            });
+
+            // Quiz link generation and WebSocket handling
+            const quizId = "{{ quiz.id }}";
+            const wsScheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${wsScheme}//${window.location.host}/ws/quiz-link/${quizId}/`;
+            
+            let ws = new WebSocket(wsUrl);
+
+            ws.onopen = function() {
+                console.log("WebSocket connected");
+            };
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.quiz_link) {
+                    displayQuizLink(data.quiz_link);
+                }
+            };
+
+            // Generate quiz button click handler
+            $("#generate-quiz").click(function() {
+                // Check if any questions have been added
+                if ($("#question-items li").length === 0) {
+                    // Show error message
+                    $("#form-alerts").html(`
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            Please add at least one question before generating the quiz.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
+                    return;
+                }
+                
+                // Show loading state
+                const originalText = $(this).text();
+                $(this).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Generating...');
+                $(this).prop('disabled', true);
+                
+                $.ajax({
+                    url: `/generate-quiz-link/${quizId}/`,
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.quiz_link) {
+                            displayQuizLink(response.quiz_link);
+                        }
+                        // Reset button
+                        $("#generate-quiz").text(originalText);
+                        $("#generate-quiz").prop('disabled', false);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error generating quiz link:", error);
+                        
+                        // Create alert for error
+                        $("#form-alerts").html(`
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                Error generating quiz link. Please try again.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        `);
+                        
+                        // Reset button
+                        $("#generate-quiz").text(originalText);
+                        $("#generate-quiz").prop('disabled', false);
+                    }
+                });
+            });
+
+            // Function to display quiz link
+            function displayQuizLink(link) {
+                // Remove any existing protocol and host if present in the link
+                const cleanLink = link.replace(/^(https?:\/\/[^\/]+)/, '');
+                const fullQuizURL = window.location.origin + cleanLink;
+                
+                // Show quiz link container with animation
+                $("#quiz-link-container").fadeIn(300);
+                $("#quiz-link").val(fullQuizURL);
+                
+                // Scroll to the quiz link container
+                $('html, body').animate({
+                    scrollTop: $("#quiz-link-container").offset().top - 100
+                }, 500);
+            }
+
+            // Copy link button handler
+            $("#copy-link").click(function() {
+                const quizLink = document.getElementById("quiz-link");
+                quizLink.select();
+                document.execCommand("copy");
+                
+                // Visual feedback for copy action
+                const originalText = $(this).text();
+                $(this).text("Copied!");
+                $(this).addClass("btn-success").removeClass("btn-outline-secondary");
+                
+                setTimeout(() => {
+                    $(this).text(originalText);
+                    $(this).removeClass("btn-success");
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

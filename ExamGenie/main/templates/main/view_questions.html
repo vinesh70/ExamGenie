@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+{% load custom_filters %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Inserted Questions</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --secondary-color: #2ecc71;
+            --secondary-dark: #27ae60;
+            --danger-color: #e74c3c;
+            --danger-dark: #c0392b;
+            --light-gray: #f5f5f5;
+            --border-color: #e0e0e0;
+            --text-color: #333;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-gray);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+        
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        h3 {
+            color: var(--secondary-color);
+            margin-top: 2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background-color: var(--light-gray);
+            border-radius: 8px;
+        }
+        
+        .filter-container label {
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+        
+        .filter-select {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .filter-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        table, th, td {
+            border: 1px solid var(--border-color);
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+        }
+        
+        tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+        
+        tr:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .delete-btn, .edit-btn {
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.1s;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .delete-btn {
+            background-color: var(--danger-color);
+        }
+        
+        .delete-btn:hover {
+            background-color: var(--danger-dark);
+            transform: translateY(-2px);
+        }
+        
+        .edit-btn {
+            background-color: var(--primary-color);
+        }
+        
+        .edit-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin: 1.5rem 0;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.1s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .back-btn:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-col {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .question-section {
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .no-questions {
+            padding: 2rem;
+            text-align: center;
+            background-color: var(--light-gray);
+            border-radius: 5px;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #666;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        /* Profile Section Styling */
+        #profile-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        {% comment %} /* Profile Photo */
+        #profile-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+            margin-right: 10px;
+            border: 2px solid white;
+            position: relative;
+        } {% endcomment %}
+
+        .profile-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 40px;
+        }
+        
+        /* Profile Dropdown */
+        #profile-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            min-width: 150px;
+            z-index: 1000;
+            
+            /* Initially hidden */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+        }
+        
+        /* Show dropdown on hover */
+        #profile-container:hover #profile-dropdown {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Dropdown Links */
+        #profile-dropdown a {
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
+        }
+        
+        #profile-dropdown a:hover {
+            background-color: #f1f1f1;
+        }
+        
+        /* Divider */
+        .divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 0;
+        }
+
+
+        button {
+            padding: 10px 20px;
+            background-color: #5cb85c;
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .nav-item {
+            background-color: #1a73e8;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            display: inline-block;
+            position: absolute;
+            right: 100px; /* Adjust distance from the right */
+            top: 4%
+            transform: translateY(-50%); /* Centers it vertically */
+        }
+
+
+        .nav-item1 {
+            background-color: #1a73e8;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            display: inline-block;
+            position: absolute;
+            right: 230px; /* Adjust distance from the right */
+            top: 4%
+            transform: translateY(-50%); /* Centers it vertically */
+        }
+    </style>
+
+
+<!-- Make sure this script is placed at the end of the body -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Toggle dropdown when clicking profile photo
+      const profilePhoto = document.getElementById('profile-photo');
+      const dropdown = document.getElementById('profile-dropdown');
+      
+      profilePhoto.addEventListener('click', function(event) {
+        event.stopPropagation(); // Prevent event from bubbling up
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(event) {
+        if (!profilePhoto.contains(event.target) && !dropdown.contains(event.target)) {
+          dropdown.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+
+
+
+    <!-- ExamGenie Navbar -->
+<div style="background-color: #1a73e8; color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; width: 100%;">
+    <!-- Brand/Logo -->
+    <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'login' %}{% endif %}" id="examgenie-brand" style="font-size: 24px; font-weight: bold; color: white; text-decoration: none; cursor: pointer;">
+      ExamGenie
+    </a>
+    
+    <a href="{% url 'dashboard' %}" class="nav-item" style="color: white; text-decoration: none; margin: 0 15px;">
+      Dashboard
+    </a>
+    
+    <!-- Profile Section -->
+    <div id="profile-container" style="position: relative; display: flex; align-items: center;">
+      <!-- Profile Photo -->
+      <div id="profile-photo" style="cursor: pointer;">
+        <img src="{{ user.profile_photo.url }}" alt="Profile" class="profile-pic" style="width: 40px; height: 40px; border-radius: 50%;">
+      </div>
+      
+      <!-- Dropdown Menu -->
+      <div id="profile-dropdown" style="position: absolute; top: 100%; right: 0; background-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.2); border-radius: 4px; display: none; min-width: 150px; margin-top: 5px; z-index: 1001;">
+        <a href="{% url 'profile' %}" style="display: block; padding: 10px 15px; color: #333; text-decoration: none;">Profile</a>
+        <div class="divider" style="height: 1px; background-color: #eee;"></div>
+        <a href="{% url 'logout' %}" style="display: block; padding: 10px 15px; color: #333; text-decoration: none;">Logout</a>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+    <div class="container">
+        <h2>Question Bank</h2>
+        
+        <div class="filter-container">
+            <div>
+                <label for="question-filter">Filter Questions:</label>
+                <select id="question-filter" class="filter-select">
+                    <option value="all">Display All</option>
+                    <option value="2">2 Marks Questions</option>
+                    <option value="5">5 Marks Questions</option>
+                    <option value="10">10 Marks Questions</option>
+                </select>
+            </div>
+            <a href="{% url 'add_question' subject_id=subject.id %}" class="back-btn">Add New Questions</a>
+        </div>
+
+        <!-- All Questions by Module -->
+        <div id="all-questions-section" class="question-section">
+            {% for chapter_num in chapters %}
+                <h3>Module {{ chapter_num }}</h3>
+                
+                <!-- 2 Marks Questions -->
+                <div class="marks-section marks-2" data-chapter="{{ chapter_num }}">
+                    <h4>2 Marks Questions</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>Co-Po Mapping</th>
+                                <th>Marks</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for question in questions %}
+                                {% if question.chapter_no == chapter_num and question.marks == 2 %}
+                                <tr>
+                                    <td>{{ question.question }}</td>
+                                    <td>{{ question.co_po_mapping }}</td>
+                                    <td>{{ question.marks }}</td>
+                                    <td class="action-col">
+                                        <a href="{% url 'edit_question' question_id=question.id %}">
+                                            <button class="edit-btn">Edit</button>
+                                        </a>
+                                        <a href="{% url 'delete_question' question_id=question.id subject_id=subject.id %}">
+                                            <button class="delete-btn">Delete</button>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                            {% if not chapter_2_marks_exists|get_item:chapter_num %}
+                                <tr>
+                                    <td colspan="4" class="no-questions">No 2 marks questions available for Module {{ chapter_num }}</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 5 Marks Questions -->
+                <div class="marks-section marks-5" data-chapter="{{ chapter_num }}">
+                    <h4>5 Marks Questions</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>Co-Po Mapping</th>
+                                <th>Marks</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for question in questions %}
+                                {% if question.chapter_no == chapter_num and question.marks == 5 %}
+                                <tr>
+                                    <td>{{ question.question }}</td>
+                                    <td>{{ question.co_po_mapping }}</td>
+                                    <td>{{ question.marks }}</td>
+                                    <td class="action-col">
+                                        <a href="{% url 'edit_question' question_id=question.id %}">
+                                            <button class="edit-btn">Edit</button>
+                                        </a>
+                                        <a href="{% url 'delete_question' question_id=question.id subject_id=subject.id %}">
+                                            <button class="delete-btn">Delete</button>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                            {% if not chapter_5_marks_exists|get_item:chapter_num %}
+                                <tr>
+                                    <td colspan="4" class="no-questions">No 5 marks questions available for Module {{ chapter_num }}</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 10 Marks Questions -->
+                <div class="marks-section marks-10" data-chapter="{{ chapter_num }}">
+                    <h4>10 Marks Questions</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>Co-Po Mapping</th>
+                                <th>Marks</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for question in questions %}
+                                {% if question.chapter_no == chapter_num and question.marks == 10 %}
+                                <tr>
+                                    <td>{{ question.question }}</td>
+                                    <td>{{ question.co_po_mapping }}</td>
+                                    <td>{{ question.marks }}</td>
+                                    <td class="action-col">
+                                        <a href="{% url 'edit_question' question_id=question.id %}">
+                                            <button class="edit-btn">Edit</button>
+                                        </a>
+                                        <a href="{% url 'delete_question' question_id=question.id subject_id=subject.id %}">
+                                            <button class="delete-btn">Delete</button>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            {% endfor %}
+                            {% if not chapter_10_marks_exists|get_item:chapter_num %}
+                                <tr>
+                                    <td colspan="4" class="no-questions">No 10 marks questions available for Module {{ chapter_num }}</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- 2 Marks Questions Section -->
+        <div id="two-marks-section" class="question-section" style="display: none;">
+            {% for chapter_num in chapters %}
+                <h3>Module {{ chapter_num }} - 2 Marks Questions</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Co-Po Mapping</th>
+                            <th>Marks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for question in questions %}
+                            {% if question.chapter_no == chapter_num and question.marks == 2 %}
+                            <tr>
+                                <td>{{ question.question }}</td>
+                                <td>{{ question.co_po_mapping }}</td>
+                                <td>{{ question.marks }}</td>
+                                <td class="action-col">
+                                    <a href="{% url 'edit_question' question_id=question.id %}">
+                                        <button class="edit-btn">Edit</button>
+                                    </a>
+                                    <a href="{% url 'delete_question' question_id=question.id subject_id=subject.id %}">
+                                        <button class="delete-btn">Delete</button>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                        {% if not chapter_2_marks_exists|get_item:chapter_num %}
+                            <tr>
+                                <td colspan="4" class="no-questions">No 2 marks questions available for Module {{ chapter_num }}</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            {% endfor %}
+        </div>
+        
+        <!-- 5 Marks Questions Section -->
+        <div id="five-marks-section" class="question-section" style="display: none;">
+            {% for chapter_num in chapters %}
+                <h3>Module {{ chapter_num }} - 5 Marks Questions</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Co-Po Mapping</th>
+                            <th>Marks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for question in questions %}
+                            {% if question.chapter_no == chapter_num and question.marks == 5 %}
+                            <tr>
+                                <td>{{ question.question }}</td>
+                                <td>{{ question.co_po_mapping }}</td>
+                                <td>{{ question.marks }}</td>
+                                <td class="action-col">
+                                    <a href="{% url 'edit_question' question_id=question.id %}">
+                                        <button class="edit-btn">Edit</button>
+                                    </a>
+                                    <a href="{% url 'delete_question' question_id=question.id subject_id=subject.id %}">
+                                        <button class="delete-btn">Delete</button>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                        {% if not chapter_5_marks_exists|get_item:chapter_num %}
+                            <tr>
+                                <td colspan="4" class="no-questions">No 5 marks questions available for Module {{ chapter_num }}</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            {% endfor %}
+        </div>
+        
+        <!-- 10 Marks Questions Section -->
+        <div id="ten-marks-section" class="question-section" style="display: none;">
+            {% for chapter_num in chapters %}
+                <h3>Module {{ chapter_num }} - 10 Marks Questions</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Co-Po Mapping</th>
+                            <th>Marks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for question in questions %}
+                            {% if question.chapter_no == chapter_num and question.marks == 10 %}
+                            <tr>
+                                <td>{{ question.question }}</td>
+                                <td>{{ question.co_po_mapping }}</td>
+                                <td>{{ question.marks }}</td>
+                                <td class="action-col">
+                                    <a href="{% url 'edit_question' question_id=question.id %}">
+                                        <button class="edit-btn">Edit</button>
+                                    </a>
+                                    <a href="{% url 'delete_question' question_id=question.id subject_id=subject.id %}">
+                                        <button class="delete-btn">Delete</button>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                        {% if not chapter_10_marks_exists|get_item:chapter_num %}
+                            <tr>
+                                <td colspan="4" class="no-questions">No 10 marks questions available for Module {{ chapter_num }}</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            {% endfor %}
+        </div>
+
+        <!-- Back Button -->
+        {% comment %} <a href="{% url 'add-question' %}" class="back-btn">Back to Add Questions</a> {% endcomment %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterSelect = document.getElementById('question-filter');
+            const allQuestionsSection = document.getElementById('all-questions-section');
+            const twoMarksSection = document.getElementById('two-marks-section');
+            const fiveMarksSection = document.getElementById('five-marks-section');
+            const tenMarksSection = document.getElementById('ten-marks-section');
+            
+            // Function to hide all sections
+            function hideAllSections() {
+                allQuestionsSection.style.display = 'none';
+                twoMarksSection.style.display = 'none';
+                fiveMarksSection.style.display = 'none';
+                tenMarksSection.style.display = 'none';
+            }
+            
+            // Event listener for filter change
+            filterSelect.addEventListener('change', function() {
+                hideAllSections();
+                
+                // Show the appropriate section based on the selected value
+                switch(this.value) {
+                    case 'all':
+                        allQuestionsSection.style.display = 'block';
+                        break;
+                    case '2':
+                        twoMarksSection.style.display = 'block';
+                        break;
+                    case '5':
+                        fiveMarksSection.style.display = 'block';
+                        break;
+                    case '10':
+                        tenMarksSection.style.display = 'block';
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

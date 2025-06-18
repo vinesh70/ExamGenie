@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ExamGenie</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-light: #2563eb;
+            --primary-hover: #3b82f6;
+            --secondary: #66BB6A;
+            --secondary-hover: #388E3C;
+            --danger: #FF6B6B;
+            --danger-hover: #D32F2F;
+            --bg-gradient: linear-gradient(to right, #e3f2fd, #ffffff);
+            --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --card-bg: #f8fafc;
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-muted: #777;
+            --border-radius: 12px;
+            --border-radius-sm: 6px;
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #ffffff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        /* Header styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: #ffffff;
+            border-bottom: 2px solid #e3f2fd;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .logo { width: 40px; height: 40px; }
+
+        .dashboard-title {
+            font-size: 2.2rem;
+            color: var(--primary);
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(90deg, var(--primary), #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-message {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-style: italic;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .welcome-message::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-light), #A78BFA);
+            border-radius: 2px;
+        }
+
+        /* Navigation */
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0.8rem;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        /* Profile styles */
+        .profile-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            gap: 10px;
+        }
+
+        .profile-pic {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-light);
+            transition: var(--transition);
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .profile-role {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: white;
+            box-shadow: var(--box-shadow);
+            border-radius: 8px;
+            overflow: hidden;
+            width: 180px;
+            z-index: 101;
+        }
+
+        .profile-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.8rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .profile-dropdown a:hover {
+            background: var(--card-bg);
+            color: var(--primary);
+        }
+
+        /* Stats section */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0 2.5rem 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card:nth-child(2) { border-left-color: var(--secondary); }
+        .stat-card:nth-child(3) { border-left-color: var(--danger); }
+        .stat-card:nth-child(4) { border-left-color: #29B6F6; }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+
+        /* Button groups */
+        .dashboard-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .button-group {
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            transition: var(--transition);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button-group::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .button-group:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow);
+        }
+
+        .button-group h3 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .button-group p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.2rem;
+            flex-grow: 1;
+        }
+
+        .button-actions {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .dashboard-button {
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .dashboard-button:hover {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .secondary-button {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary-light);
+        }
+
+        .secondary-button:hover {
+            background: var(--card-bg);
+            color: var(--primary-hover);
+        }
+
+        .logout-button {
+            margin-top: 2rem;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+        }
+
+        .logout-button:hover {
+            background: linear-gradient(135deg, var(--danger), var(--danger-hover));
+        }
+
+        /* Additional content */
+        .additional-content {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin: 2rem 0;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .additional-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), #8B5CF6);
+        }
+
+        /* Footer */
+        .dashboard-footer {
+            margin-top: 3rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e3f2fd;
+        }
+
+        .dashboard-footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .dashboard-footer a:hover {
+            color: #8B5CF6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header { padding: 1rem; }
+            .dashboard-buttons { grid-template-columns: 1fr; }
+            .stats-container { grid-template-columns: repeat(2, 1fr); }
+            .container { padding: 1.5rem; margin: 1rem auto; width: 95%; }
+            .dashboard-title { font-size: 1.8rem; }
+        }
+
+        @media (max-width: 576px) {
+            .stats-container { grid-template-columns: 1fr; }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .profile-container { align-self: flex-end; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <img src="{% static 'images/logo.png' %}" alt="ExamGenie Logo" class="logo">
+            <h1 class="dashboard-title">Teacher's Dashboard</h1>
+        </div>
+        
+        <div class="profile-container" onclick="toggleDropdown(event)">
+            <img src="{{ user.profile_photo.url }}" alt="Teacher's Photo" class="profile-pic">
+            <div class="profile-info">
+                <span class="profile-name">{{ user.first_name }} {{ user.last_name }}</span>
+                <span class="profile-role">Teacher</span>
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Profile</a>
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <p class="welcome-message">Welcome, {{ user.first_name }} {{ user.last_name }}! Manage your teaching resources effectively.</p>
+
+        {% comment %} <!-- Stats section -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                </div>
+                <div class="stat-value">24</div>
+                <div>Papers Created</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-value">512</div>
+                <div>Questions in Bank</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="stat-value">17</div>
+                <div>No. of Quizzes Created</div>
+            </div>
+        </div> {% endcomment %}
+
+        <div class="dashboard-buttons">
+            <div class="button-group">
+                <h3><i class="fas fa-file-alt"></i> Generate Question Papers</h3>
+                <p>Create customized question papers by selecting subjects, topics, and marks. Cover all key areas of the syllabus with varied difficulty levels.</p>
+                <div class="button-actions">
+                    <a href="{% url 'generate_paper_form' %}" class="dashboard-button"><i class="fas fa-plus"></i> Generate Paper</a>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <h3><i class="fas fa-database"></i> Insert New Questions</h3>
+                <p>Add new questions to your question bank, categorized by subject, topic, and difficulty level for future assessments.</p>
+                <div class="button-actions">
+                    <a href="{% url 'insert_questions' %}" class="dashboard-button"><i class="fas fa-plus-circle"></i> Insert Questions</a>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <h3><i class="fas fa-file-upload"></i> Generate from Notes</h3>
+                <p>Transform study materials into question papers. Our AI extracts important topics and converts them into meaningful questions.</p>
+                <div class="button-actions">
+                    <a href="{% url 'upload_files' %}" class="dashboard-button"><i class="fas fa-file-import"></i> Upload Notes</a>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <h3><i class="fas fa-calendar-alt"></i> Timetable Management</h3>
+                <p>Create, modify, and manage exam timetables. Set reminders and allocate time slots for different subjects.</p>
+                <div class="button-actions">
+                    <a href="{% url 'add_timetable' %}" class="dashboard-button"><i class="fas fa-calendar-plus"></i> Generate Timetable</a>
+                    <a href="{% url 'view_timetable' %}" class="dashboard-button secondary-button"><i class="fas fa-eye"></i> View</a>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <h3><i class="fas fa-pen-fancy"></i> Generate Answers</h3>
+                <p>Efficiently generate well-explained answers for question papers, helping students review and understand solutions.</p>
+                <div class="button-actions">
+                    <a href="{% url 'upload_question_paper' %}" class="dashboard-button"><i class="fas fa-file-upload"></i> Upload Paper</a>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <h3><i class="fas fa-question"></i> Conduct Real-Time Quizzes</h3>
+                <p>Create interactive quizzes with instant feedback. Track student performance with automated evaluation and analytics.</p>
+                <div class="button-actions">
+                    <a href="{% url 'create_quiz' %}" class="dashboard-button"><i class="fas fa-plus"></i> Create Quiz</a>
+                    <a href="{% url 'quiz_analysis' %}" class="dashboard-button secondary-button"><i class="fas fa-chart-line"></i> Analytics</a>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <h3><i class="fas fa-sticky-note"></i> Quick Notes</h3>
+                <p>Capture and organize thoughts on the go. Create multiple files for different subjects, classes, or topics, all auto-saved.</p>
+                <div class="button-actions">
+                    <a href="{% url 'quick_notes' %}" class="dashboard-button"><i class="fas fa-edit"></i> Quick Notes</a>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <h3><i class="fas fa-copy"></i> Plagiarism Checker</h3>
+                <p>Ensure originality in academic work by scanning documents against a vast database of sources.</p>
+                <div class="button-actions">
+                    <a href="{% url 'plagiarism_checker' %}" class="dashboard-button"><i class="fas fa-search"></i> Check Plagiarism</a>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <h3><i class="fas fa-save"></i> Saved Question Papers</h3>
+                <p>Access previously saved question papers. View and delete your collection of generated papers.</p>
+                <div class="button-actions">
+                    <a href="{% url 'view_question_papers' %}" class="dashboard-button"><i class="fas fa-folder-open"></i> Show Saved Papers</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="additional-content">
+            <p>Teaching is a dynamic process that requires constant evolution. With our platform, you can stay ahead by utilizing cutting-edge tools designed to make your workload more manageable. By leveraging technology, you can create a more effective and engaging learning experience for your students.</p>
+            <p>Incorporating technology into education enhances productivity and improves learning outcomes. Our dashboard is built to provide you with maximum convenience, ensuring that you spend less time on administrative tasks and more time on teaching.</p>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="{% url 'logout' %}" class="dashboard-button logout-button"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+
+        <div class="dashboard-footer">
+            <p>&copy; 2025 ExamGenie. All rights reserved. | <a href="mailto:support@examgenie.com">Contact Support</a></p>
+        </div>
+    </div>
+
+    <script>
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById("profileDropdown");
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        }
+    
+        document.addEventListener("click", function(event) {
+            const dropdown = document.getElementById("profileDropdown");
+            const profileContainer = document.querySelector(".profile-container");
+            if (!profileContainer.contains(event.target)) {
+                dropdown.style.display = "none";
+            }
+        });
+
+        // Add hover effect to button groups
+        document.querySelectorAll('.button-group').forEach(group => {
+            group.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 12px 20px rgba(0,0,0,0.15)';
+            });
+            
+            group.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.08)';
+            });
+        });
+    </script>
+</body>
+</html>
